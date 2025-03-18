@@ -1,1 +1,1 @@
-A book library project.
+A book library project, with a recommendation system.
