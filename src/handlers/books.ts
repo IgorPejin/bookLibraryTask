@@ -1,7 +1,7 @@
 import { request, Request, Response } from "express";
 
 export function getAllBooks(request: Request, response: Response) {
-  response.send([]);
+  response.send([{ title: "test", author: "author" }]);
 }
 
 export function getBookById(request: Request, response: Response) {
