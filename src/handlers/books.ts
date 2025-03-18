@@ -1,7 +1,9 @@
 import { request, Request, Response } from "express";
+import { LibraryService } from "../services/libraryService";
 
-export function getAllBooks(request: Request, response: Response) {
-  response.send([{ title: "test", author: "author" }]);
+export async function getAllBooks(request: Request, response: Response) {
+  const books = await LibraryService.readAllBooks();
+  response.send(books);
 }
 
 export function getBookById(request: Request, response: Response) {
