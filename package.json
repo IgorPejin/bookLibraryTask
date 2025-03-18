@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "start": "npm run build && node ./dist/index.js",
-    "dev": "nodemon ./src/index.ts"
+    "start:seeded": "npm run build && node ./dist/index.js -- --seed true",
+    "dev": "nodemon --ignore src/repository ./src/index.ts",
+    "dev:seeded": "nodemon --ignore src/repository ./src/index.ts -- --seed true"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +19,7 @@
     "express": "^4.21.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "nodemon": "^3.1.9",
