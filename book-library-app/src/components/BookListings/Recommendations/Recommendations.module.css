@@ -12,8 +12,7 @@
 .recommendationsList {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 4rem;
   justify-content: center;
-  padding: 20px;
   list-style-type: none;
 }
