@@ -24,4 +24,12 @@ export class LibraryService {
     }
     return await LibraryService.readBooksAndUpdateCache();
   }
+
+  static async getRecommendations(genre: string): Promise<Book[]> {
+    const books = await this.readAllBooks();
+    const recommendedBooks = books
+      .filter((book) => book.recommendations >= 6 && book.genre === genre)
+      .slice(0, 4);
+    return recommendedBooks;
+  }
 }

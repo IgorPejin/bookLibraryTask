@@ -10,8 +10,11 @@ export function getBookById(request: Request, response: Response) {
   response.send({});
 }
 
-export function getRecommendations(request: Request, response: Response) {
-  response.send([]);
+export async function getRecommendations(request: Request, response: Response) {
+  const genre = request.params.genre;
+  console.log(genre);
+  const recommendedBooks = await LibraryService.getRecommendations(genre);
+  response.send(recommendedBooks);
 }
 
 export function addBook(request: Request, response: Response) {

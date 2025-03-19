@@ -9,6 +9,10 @@
   display: flex;
   justify-content: space-between;
 }
+.recommendationsOptions {
+  display: flex;
+  justify-content: space-between;
+}
 .recommendationsList {
   display: flex;
   flex-wrap: wrap;

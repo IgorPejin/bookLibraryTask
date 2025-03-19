@@ -17,9 +17,7 @@ function BookListings() {
   }, []);
   return (
     <div className={styles.bookListingsWrapper}>
-      <Recommendations
-        books={books.filter((book) => book.recommendations >= 8)}
-      />
+      <Recommendations />
       <LibraryListing books={books} />
     </div>
   );
