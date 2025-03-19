@@ -1,7 +1,15 @@
-import styles from "./RecommendedBook.module.css";
+import Book from "../../../../types/book";
 
-function RecommendedBook() {
-  return <div className={styles.recommendedBookWrapper}></div>;
+interface Props {
+  book: Book;
 }
+
+const RecommendedBook = (props: Props) => {
+  return (
+    <li>
+      {props.book.title} by {props.book.author}
+    </li>
+  );
+};
 
 export default RecommendedBook;
