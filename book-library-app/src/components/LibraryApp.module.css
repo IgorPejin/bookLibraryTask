@@ -1,3 +1,11 @@
 .libraryAppWrapper {
-  padding: 1rem;
+  padding: 3rem 10rem;
+  display: flex;
+  gap: 5rem;
+  height: calc(100vh - 6rem);
+  flex-direction: column;
+  align-items: center;
+}
+.libraryAppHeading {
+  align-self: flex-start;
 }

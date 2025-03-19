@@ -1,3 +1,19 @@
 .recommendedBookWrapper {
   cursor: pointer;
+  perspective: 1000px;
+}
+
+.recommendedBook {
+  width: 15rem;
+  height: 20rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  text-align: center;
+
+  cursor: pointer;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

@@ -7,7 +7,9 @@ interface Props {
 const LibraryListing = (props: Props) => {
   return (
     <div className={styles.libraryListingWrapper}>
-      <h2>Here are all of the books</h2>
+      <div>
+        <h2>Or browse the library yourself!</h2>
+      </div>
       <ul>
         {props.books.map((book) => (
           <li key={book.id}>
