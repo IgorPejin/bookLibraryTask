@@ -15,10 +15,15 @@ function BookListings() {
     };
     getBooks();
   }, []);
+
+  const addBook = (book: Book) => {
+    setBooks([...books, book]);
+  };
+
   return (
     <div className={styles.bookListingsWrapper}>
       <Recommendations />
-      <LibraryListing books={books} />
+      <LibraryListing books={books} addBook={addBook} />
     </div>
   );
 }

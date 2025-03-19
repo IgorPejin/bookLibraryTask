@@ -6,12 +6,15 @@
   flex-direction: column;
   align-items: center;
 }
-.libraryListingHeader {
+.libraryListingHeader,
+.libraryListingAdd {
   display: flex;
   width: 100%;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
 }
+
 .libraryListingOptions {
   display: flex;
   justify-content: center;
