@@ -7,7 +7,7 @@ interface Props {
 const LibraryListing = (props: Props) => {
   return (
     <div className={styles.libraryListingWrapper}>
-      <div>
+      <div className={styles.libraryListingHeader}>
         <h2>Or browse the library yourself!</h2>
       </div>
       <ul>

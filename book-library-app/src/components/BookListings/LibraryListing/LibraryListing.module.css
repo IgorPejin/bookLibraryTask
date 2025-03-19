@@ -2,3 +2,7 @@
   cursor: pointer;
   width: 100%;
 }
+.libraryListingHeader {
+  display: flex;
+  justify-content: space-between;
+}
