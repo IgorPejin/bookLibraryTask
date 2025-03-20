@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { LibraryService } from "../services/libraryService";
+import { UploadedFile } from "express-fileupload";
 
 export async function getAllBooks(request: Request, response: Response) {
   const books = await LibraryService.readAllBooks();
@@ -35,8 +36,14 @@ export async function addBook(request: Request, response: Response) {
   }
 }
 
-export function importBooks(request: Request, response: Response) {
-  response.send({});
+export async function importBooks(request: Request, response: Response) {
+  const file = request.files?.importBooksFile;
+  const appendedBooks = await LibraryService.importBooks(file);
+  if (appendedBooks instanceof Error) {
+    response.send({ error: "Cant upload this file" });
+  } else {
+    response.send(appendedBooks);
+  }
 }
 
 export async function updateBookById(request: Request, response: Response) {

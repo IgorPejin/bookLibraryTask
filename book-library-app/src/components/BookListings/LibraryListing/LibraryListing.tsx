@@ -24,6 +24,7 @@ interface Props {
   books: Book[];
   addBook: (book: Book) => void;
   updateBooks: (newBookData: Book) => void;
+  updateBooksBatched: (newBooks: Book[]) => void;
   deleteBook: (book: Book) => void;
 }
 const VisuallyHiddenInput = styled("input")({
@@ -143,6 +144,7 @@ const LibraryListing = (props: Props) => {
       if (addBookResponse.data.error) {
         alert(addBookResponse.data.error);
       } else {
+        alert("Book added!");
         props.addBook(addBookResponse.data);
       }
     } else {
@@ -163,6 +165,27 @@ const LibraryListing = (props: Props) => {
       }
     }
   };
+
+  async function handleImportBooks(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files;
+    if (file && file[0].type === "application/json") {
+      const formData = new FormData();
+      formData.append("importBooksFile", file[0]);
+      const importBooksResponse = await axios.post(
+        `http://localhost:3000/books/import`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      if (importBooksResponse.data.error) {
+        alert(importBooksResponse.data.error);
+      } else {
+        alert("Updated all books!");
+        props.updateBooksBatched(importBooksResponse.data);
+      }
+    } else {
+      alert("File is not a JSON file.");
+    }
+  }
 
   return (
     <div className={styles.libraryListingWrapper}>
@@ -258,7 +281,8 @@ const LibraryListing = (props: Props) => {
             Import Books
             <VisuallyHiddenInput
               type="file"
-              onChange={(event) => console.log(event.target.files)}
+              accept="application/json"
+              onChange={(event) => handleImportBooks(event)}
               multiple
             />
           </Button>

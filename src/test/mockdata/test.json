@@ -1,0 +1,18 @@
+[
+  {
+    "id": "0-680-91103-0",
+    "title": "The Brief Wondrous Life of Oscar Wao",
+    "author": "Anthony Trollope",
+    "year": 2000,
+    "genre": "Western",
+    "recommendations": 6
+  },
+  {
+    "id": "5-55-99999999-5",
+    "title": "Test",
+    "author": "This book is for testing",
+    "year": 2001,
+    "genre": "The book above can exist",
+    "recommendations": 6
+  }
+]

@@ -19,6 +19,9 @@ function BookListings() {
   const addBook = (book: Book) => {
     setBooks([...books, book]);
   };
+  const updateBooksBatched = (books: Book[]) => {
+    setBooks(() => [...books]);
+  };
   const updateBooks = (newBookData: Book) => {
     const updatedBooks = books.map((book) =>
       book.id === newBookData.id ? { ...book, ...newBookData } : book
@@ -38,6 +41,7 @@ function BookListings() {
         addBook={addBook}
         updateBooks={updateBooks}
         deleteBook={deleteBook}
+        updateBooksBatched={updateBooksBatched}
       />
     </div>
   );

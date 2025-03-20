@@ -90,6 +90,49 @@ export class LibraryService {
     }
   }
 
+  static isValidBook(book: any): book is Book {
+    return (
+      typeof book.id === "string" &&
+      typeof book.title === "string" &&
+      typeof book.author === "string" &&
+      typeof book.year === "number" &&
+      typeof book.genre === "string" &&
+      typeof book.recommendations === "number"
+    );
+  }
+
+  static async importBooks(file: any): Promise<Book[] | Error> {
+    try {
+      const books = await this.readAllBooks();
+      const jsonData = JSON.parse(file.data.toString());
+
+      if (!Array.isArray(jsonData)) {
+        console.log("its array");
+        return new Error("Invalid JSON format! Expected an array of books.");
+      }
+
+      const validBooks: Book[] = jsonData.filter((book: any) =>
+        LibraryService.isValidBook(book)
+      );
+
+      const appendedBooks = [...books, ...validBooks].reduce<Book[]>(
+        (acc, book) => {
+          if (!acc.some((b) => b.id === book.id)) {
+            acc.push(book);
+          }
+          return acc;
+        },
+        []
+      );
+
+      await this.writeBooks(appendedBooks);
+
+      return appendedBooks;
+    } catch (error) {
+      return new Error("Invalid JSON format!");
+    }
+  }
+
   static async getRecommendations(genre: string): Promise<Book[]> {
     const books = await this.readAllBooks();
     const recommendedBooks = books
