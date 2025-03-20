@@ -4,5 +4,6 @@ export default interface Book {
   author: string;
   year: number;
   genre: string;
-  recommendations: number;
+  recommendations?: number;
+  nonrecommendations?: number;
 }

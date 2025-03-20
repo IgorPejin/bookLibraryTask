@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { LibraryService } from "../services/libraryService";
-import { UploadedFile } from "express-fileupload";
 
 export async function getAllBooks(request: Request, response: Response) {
   const books = await LibraryService.readAllBooks();
@@ -22,6 +21,22 @@ export async function getRecommendations(request: Request, response: Response) {
   const genre = request.params.genre;
   const recommendedBooks = await LibraryService.getRecommendations(genre);
   response.send(recommendedBooks);
+}
+
+export async function updateRecommendations(
+  request: Request,
+  response: Response
+) {
+  const book = request.body;
+  const bookId = book.id;
+
+  const updatedBook = await LibraryService.updateBook(bookId, book);
+  if (updatedBook instanceof Error) {
+    response.send({ error: "Book that you wanted to update does not exist" });
+  } else {
+    console.log("Sucesfully updated book !");
+    response.send(updatedBook);
+  }
 }
 
 export async function addBook(request: Request, response: Response) {

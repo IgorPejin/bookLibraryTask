@@ -17,6 +17,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Rating from "@mui/material/Rating";
 import Box from "@mui/material/Box";
+import ReplayIcon from "@mui/icons-material/Replay";
 import { useState } from "react";
 import axios from "axios";
 
@@ -112,7 +113,8 @@ const LibraryListing = (props: Props) => {
       author: author,
       year: Number(year),
       genre: genre,
-      recommendations: 0,
+      recommendations: selectedBook?.recommendations,
+      nonrecommendations: selectedBook?.nonrecommendations,
     };
     const updateBookResponse = await axios.put(
       `http://localhost:3000/books/${selectedBook?.id}`,
@@ -136,6 +138,7 @@ const LibraryListing = (props: Props) => {
         year: Number(year),
         genre: genre,
         recommendations: 0,
+        nonrecommendations: 0,
       };
       const addBookResponse = await axios.post(
         "http://localhost:3000/books",
@@ -186,6 +189,49 @@ const LibraryListing = (props: Props) => {
       alert("File is not a JSON file.");
     }
   }
+
+  const handleUndoRating = () => {
+    setRating(0);
+  };
+
+  const handleUpdateRating = async (
+    event: React.SyntheticEvent,
+    newRating: number | null,
+    book: Book
+  ) => {
+    event.preventDefault();
+    setRating(newRating);
+
+    const toRecommend = newRating && newRating > 5 ? true : false;
+
+    const newBookRecommendations =
+      book.recommendations && toRecommend
+        ? book.recommendations++
+        : book.recommendations;
+
+    const newBookNonRecommendations =
+      book.nonrecommendations && !toRecommend
+        ? book.nonrecommendations++
+        : book.nonrecommendations;
+
+    const updatedBook: Book = {
+      id: isbn,
+      title: title,
+      author: author,
+      year: Number(year),
+      genre: genre,
+      recommendations: newBookRecommendations,
+      nonrecommendations: newBookNonRecommendations,
+    };
+
+    const recommendationsResponse = await axios.put(
+      `http://localhost:3000/books/recommendations/${toRecommend}}`,
+      updatedBook
+    );
+    if (recommendationsResponse.data.error) {
+      alert(recommendationsResponse.data.error);
+    }
+  };
 
   return (
     <div className={styles.libraryListingWrapper}>
@@ -316,16 +362,30 @@ const LibraryListing = (props: Props) => {
                   <ListItemText>
                     <Box>
                       <Typography component="legend">
-                        {rating !== 0 ? "✍️ Rated!" : "🤔 Rate this book ?"}
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          {rating !== 0 && (
+                            <>
+                              <IconButton
+                                size="small"
+                                sx={{ marginRight: "2rem", padding: "0" }}
+                                onClick={() => handleUndoRating()}
+                                color="primary"
+                              >
+                                <ReplayIcon />
+                              </IconButton>
+                            </>
+                          )}
+                          {rating !== 0 ? "✍️ Rated!" : "🤔 Rate this book ?"}
+                        </div>
                       </Typography>
                       <Rating
+                        disabled={rating !== 0}
                         name="simple-controlled"
                         value={rating}
                         max={10}
-                        onChange={(event, newValue) => {
-                          event.preventDefault();
-                          setRating(newValue);
-                        }}
+                        onChange={(event, newValue) =>
+                          handleUpdateRating(event, newValue, book)
+                        }
                       />
                     </Box>
                   </ListItemText>

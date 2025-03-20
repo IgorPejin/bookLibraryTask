@@ -107,7 +107,6 @@ export class LibraryService {
       const jsonData = JSON.parse(file.data.toString());
 
       if (!Array.isArray(jsonData)) {
-        console.log("its array");
         return new Error("Invalid JSON format! Expected an array of books.");
       }
 
@@ -136,7 +135,10 @@ export class LibraryService {
   static async getRecommendations(genre: string): Promise<Book[]> {
     const books = await this.readAllBooks();
     const recommendedBooks = books
-      .filter((book) => book.recommendations >= 6 && book.genre === genre)
+      .filter(
+        (book) =>
+          book.recommendations > book.nonrecommendations && book.genre === genre
+      )
       .slice(0, 4);
     return recommendedBooks;
   }

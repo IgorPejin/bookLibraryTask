@@ -16,6 +16,7 @@ async function generateBooks(): Promise<Book[]> {
       year: faker.date.past({ years: 100 }).getFullYear(),
       genre: faker.book.genre(),
       recommendations: Math.floor(Math.random() * MAX_BOOK_RATING) + 1,
+      nonrecommendations: Math.floor(Math.random() * MAX_BOOK_RATING) + 1,
     });
   }
   return books;

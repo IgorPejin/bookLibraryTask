@@ -5,4 +5,5 @@ export type Book = {
   year: number;
   genre: string;
   recommendations: number;
+  nonrecommendations: number;
 };
