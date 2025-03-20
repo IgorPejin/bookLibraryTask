@@ -6,8 +6,15 @@ export async function getAllBooks(request: Request, response: Response) {
   response.send(books);
 }
 
-export function getBookById(request: Request, response: Response) {
-  response.send({});
+export async function getBookById(request: Request, response: Response) {
+  const id = request.params.id;
+  const book = await LibraryService.getBookById(id);
+
+  if (book instanceof Error) {
+    response.send({ error: "Book does not exist" });
+  } else {
+    response.send(book);
+  }
 }
 
 export async function getRecommendations(request: Request, response: Response) {

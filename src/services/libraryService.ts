@@ -80,6 +80,16 @@ export class LibraryService {
     await this.writeBooks(updatedBooks);
   }
 
+  static async getBookById(bookId: string): Promise<Book | Error> {
+    const books = await this.readAllBooks();
+    const bookFound = books.find((book) => book.id === bookId);
+    if (bookFound === undefined) {
+      return new Error("Book that you want to find does not exist!");
+    } else {
+      return bookFound;
+    }
+  }
+
   static async getRecommendations(genre: string): Promise<Book[]> {
     const books = await this.readAllBooks();
     const recommendedBooks = books
