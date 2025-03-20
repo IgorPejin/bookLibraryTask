@@ -74,6 +74,12 @@ export class LibraryService {
     }
   }
 
+  static async deleteBook(deleteBookId: string): Promise<void> {
+    const books = await this.readAllBooks();
+    const updatedBooks = books.filter((book) => book.id !== deleteBookId);
+    await this.writeBooks(updatedBooks);
+  }
+
   static async getRecommendations(genre: string): Promise<Book[]> {
     const books = await this.readAllBooks();
     const recommendedBooks = books

@@ -25,6 +25,10 @@ function BookListings() {
     );
     setBooks(() => [...updatedBooks]);
   };
+  const deleteBook = (bookToDelete: Book) => {
+    const updatedBooks = books.filter((book) => book.id !== bookToDelete.id);
+    setBooks(() => [...updatedBooks]);
+  };
 
   return (
     <div className={styles.bookListingsWrapper}>
@@ -33,6 +37,7 @@ function BookListings() {
         books={books}
         addBook={addBook}
         updateBooks={updateBooks}
+        deleteBook={deleteBook}
       />
     </div>
   );

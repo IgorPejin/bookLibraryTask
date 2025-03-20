@@ -24,6 +24,7 @@ interface Props {
   books: Book[];
   addBook: (book: Book) => void;
   updateBooks: (newBookData: Book) => void;
+  deleteBook: (book: Book) => void;
 }
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -146,6 +147,20 @@ const LibraryListing = (props: Props) => {
       }
     } else {
       alert("Fill out all fields");
+    }
+  };
+
+  const handleDeleteButton = async (book: Book) => {
+    if (confirm("Are you sure you want to delete this book?")) {
+      const addBookResponse = await axios.delete(
+        `http://localhost:3000/books/${book.id}`
+      );
+      if (addBookResponse.data.error) {
+        alert(addBookResponse.data.error);
+      } else {
+        clearFields();
+        props.deleteBook(book);
+      }
     }
   };
 
@@ -294,7 +309,10 @@ const LibraryListing = (props: Props) => {
               )}
 
               <Tooltip title="Delete book">
-                <IconButton color="error">
+                <IconButton
+                  onClick={() => handleDeleteButton(book)}
+                  color="error"
+                >
                   <DeleteIcon />
                 </IconButton>
               </Tooltip>

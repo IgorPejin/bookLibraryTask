@@ -13,4 +13,7 @@ export const genres: Option[] = [
   { label: "Psychology" },
   { label: "Historical Fiction" },
   { label: "Children's Literature" },
+  { label: "Romance" },
+  { label: "Horror" },
+  { label: "Graphic Novel" },
 ];

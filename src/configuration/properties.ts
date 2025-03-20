@@ -1,6 +1,6 @@
 import path from "path";
 
-export const INITAL_BOOKS_NUMBER = 15;
+export const INITAL_BOOKS_NUMBER = 50;
 export const MAX_BOOK_RATING = 10;
 
 export const LIBRARY_PATH = path.join(

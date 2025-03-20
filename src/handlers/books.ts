@@ -47,6 +47,8 @@ export async function updateBookById(request: Request, response: Response) {
   }
 }
 
-export function deleteBookById(request: Request, response: Response) {
-  response.send({});
+export async function deleteBookById(request: Request, response: Response) {
+  const deleteBookId = request.params.id;
+  const deletedBook = await LibraryService.deleteBook(deleteBookId);
+  response.send({ message: "Succesfully deleted book!" });
 }

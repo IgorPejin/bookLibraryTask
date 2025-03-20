@@ -35,7 +35,7 @@ const Recommendations = () => {
   return (
     <div className={styles.recommendationsWrapper}>
       <div className={styles.recommendationsOptions}>
-        <h2>Books recommended by genre: </h2>
+        <h2>Books recommended by genre </h2>
         <Autocomplete
           options={genres}
           onChange={handleChange}
