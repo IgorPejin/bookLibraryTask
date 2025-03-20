@@ -10,7 +10,7 @@ import { genres, Option } from "../../../utils/genres";
 
 const Recommendations = () => {
   const [books, setBooks] = useState<Book[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<Option | null>();
+  const [selectedGenre, setSelectedGenre] = useState<Option | null>(null);
 
   useEffect(() => {
     const getBooks = async () => {

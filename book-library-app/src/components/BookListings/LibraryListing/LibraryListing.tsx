@@ -12,14 +12,18 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendAndArchiveIcon from "@mui/icons-material/SendAndArchive";
+import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
+import Rating from "@mui/material/Rating";
+import Box from "@mui/material/Box";
 import { useState } from "react";
 import axios from "axios";
 
 interface Props {
   books: Book[];
   addBook: (book: Book) => void;
+  updateBooks: (newBookData: Book) => void;
 }
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -35,14 +39,33 @@ const VisuallyHiddenInput = styled("input")({
 
 const LibraryListing = (props: Props) => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [selectedBook, setSelectedBook] = useState<Book>();
+  const [rating, setRating] = useState<number | null>(0);
   const [isbn, setIsbn] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
   const [year, setYear] = useState<string>("");
   const [genre, setGenre] = useState<string>("");
 
+  function clearFields() {
+    setIsbn("");
+    setTitle("");
+    setAuthor("");
+    setYear("");
+    setGenre("");
+  }
+
   const handleIsAdding = () => {
+    clearFields();
+    setIsEditing(false);
     setIsAdding(!isAdding);
+  };
+
+  const handleBackButton = () => {
+    clearFields();
+    setIsAdding(false);
+    setIsEditing(false);
   };
 
   function handleChangeIsbn(e: React.ChangeEvent<HTMLInputElement>) {
@@ -68,8 +91,41 @@ const LibraryListing = (props: Props) => {
     }
   };
 
+  const handleIsEditing = (book: Book) => {
+    clearFields();
+    setSelectedBook(book);
+    setIsAdding(false);
+    setIsEditing(true);
+    setIsbn(book.id);
+    setTitle(book.title);
+    setAuthor(book.author);
+    setYear(String(book.year));
+    setGenre(book.genre);
+  };
+
+  const handleBookEdit = async (selectedBook: Book | undefined) => {
+    const editedBook: Book = {
+      id: isbn,
+      title: title,
+      author: author,
+      year: Number(year),
+      genre: genre,
+      recommendations: 0,
+    };
+    const updateBookResponse = await axios.put(
+      `http://localhost:3000/books/${selectedBook?.id}`,
+      editedBook
+    );
+    console.log(updateBookResponse);
+    if (updateBookResponse.data.error) {
+      alert(updateBookResponse.data.error);
+    } else {
+      alert("Book updated!");
+      props.updateBooks(editedBook);
+    }
+  };
+
   const handleBookAdd = async () => {
-    console.log(isbn, title, author, genre, year);
     if (isbn && title && author && genre && year) {
       const book: Book = {
         id: isbn,
@@ -88,17 +144,20 @@ const LibraryListing = (props: Props) => {
       } else {
         props.addBook(addBookResponse.data);
       }
+    } else {
+      alert("Fill out all fields");
     }
-    console.log("hello");
   };
 
   return (
     <div className={styles.libraryListingWrapper}>
       <div
-        style={isAdding ? { display: "flex" } : { display: "none" }}
+        style={
+          isAdding || isEditing ? { display: "flex" } : { display: "none" }
+        }
         className={styles.libraryListingAdd}
       >
-        <IconButton onClick={handleIsAdding} color="primary">
+        <IconButton onClick={handleBackButton} color="primary">
           <ArrowBackIcon />
         </IconButton>
         <TextField
@@ -143,27 +202,39 @@ const LibraryListing = (props: Props) => {
           label="genre"
           variant="standard"
         />
-        <IconButton onClick={handleBookAdd} color="primary">
-          <SendAndArchiveIcon />
-        </IconButton>
+
+        {isAdding && (
+          <IconButton onClick={handleBookAdd} color="primary">
+            <SendAndArchiveIcon />
+          </IconButton>
+        )}
+        {isEditing && (
+          <IconButton
+            onClick={() => handleBookEdit(selectedBook)}
+            color="primary"
+          >
+            <EditIcon />
+          </IconButton>
+        )}
       </div>
 
       <div
-        style={isAdding ? { display: "none" } : { display: "flex" }}
+        style={
+          isAdding || isEditing ? { display: "none" } : { display: "flex" }
+        }
         className={styles.libraryListingHeader}
       >
         <h2>Browse the library: </h2>
         <div className={styles.libraryListingOptions}>
           <Button
-            sx={{ margin: "1rem", fontSize: "1.5rem", textAlign: "center" }}
-            size="large"
+            sx={{ margin: "1rem", fontSize: "1.2rem", textAlign: "center" }}
             variant="outlined"
             onClick={handleIsAdding}
           >
             Add book
           </Button>
           <Button
-            sx={{ margin: "1rem", fontSize: "1.5rem", textAlign: "center" }}
+            sx={{ margin: "1rem", fontSize: "1.2rem", textAlign: "center" }}
             component="label"
             role={undefined}
             variant="contained"
@@ -180,18 +251,47 @@ const LibraryListing = (props: Props) => {
       </div>
       <List sx={{ width: "100%", bgcolor: "azure", marginBottom: "1rem" }}>
         {props.books.map((book) => (
-          <ListItem key={book.id} disablePadding>
+          <ListItem
+            key={book.id + book.author}
+            sx={
+              isEditing && selectedBook?.id === book.id
+                ? { backgroundColor: "#D4F1F4" }
+                : {}
+            }
+            onClick={() => handleIsEditing(book)}
+            disablePadding
+          >
             <ListItemButton>
               <ListItemText
                 inset
                 primary={`${book.title} (${book.year}) by ${book.author}`}
                 secondary={`Genre: ${book.genre}`}
               />
-              <Tooltip title="Edit book">
-                <IconButton color="primary">
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
+              {isEditing && selectedBook?.id === book.id && (
+                <>
+                  <ListItemText
+                    inset
+                    primary={`✅ This book is available!`}
+                    secondary={`ISBN: ${book.id}`}
+                  />
+                  <ListItemText>
+                    <Box>
+                      <Typography component="legend">
+                        {rating !== 0 ? "✍️ Rated!" : "🤔 Rate this book ?"}
+                      </Typography>
+                      <Rating
+                        name="simple-controlled"
+                        value={rating}
+                        max={10}
+                        onChange={(event, newValue) => {
+                          event.preventDefault();
+                          setRating(newValue);
+                        }}
+                      />
+                    </Box>
+                  </ListItemText>
+                </>
+              )}
 
               <Tooltip title="Delete book">
                 <IconButton color="error">

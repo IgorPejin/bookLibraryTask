@@ -4,6 +4,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 5rem;
   align-items: center;
 }

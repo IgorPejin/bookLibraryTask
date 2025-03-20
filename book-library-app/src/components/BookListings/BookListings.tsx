@@ -19,11 +19,21 @@ function BookListings() {
   const addBook = (book: Book) => {
     setBooks([...books, book]);
   };
+  const updateBooks = (newBookData: Book) => {
+    const updatedBooks = books.map((book) =>
+      book.id === newBookData.id ? { ...book, ...newBookData } : book
+    );
+    setBooks(() => [...updatedBooks]);
+  };
 
   return (
     <div className={styles.bookListingsWrapper}>
       <Recommendations />
-      <LibraryListing books={books} addBook={addBook} />
+      <LibraryListing
+        books={books}
+        addBook={addBook}
+        updateBooks={updateBooks}
+      />
     </div>
   );
 }

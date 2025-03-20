@@ -27,17 +27,17 @@ export class LibraryService {
     return await LibraryService.readBooksAndUpdateCache();
   }
 
-  static async writeBooks(newData: Book[]) {
+  static async writeBooks(newBooks: Book[]) {
     if (isWriting) {
       return new Promise((resolve) => {
-        writeQueue.push(() => this.writeBooks(newData).then(resolve));
+        writeQueue.push(() => this.writeBooks(newBooks).then(resolve));
       });
     }
 
     isWriting = true;
     console.log("Writing new books . . .");
-    await fs.writeFile(LIBRARY_PATH, JSON.stringify(newData, null, 2));
-    cache = newData;
+    await fs.writeFile(LIBRARY_PATH, JSON.stringify(newBooks, null, 2));
+    cache = newBooks;
     isWriting = false;
 
     if (writeQueue.length > 0) {
@@ -55,6 +55,23 @@ export class LibraryService {
       return newBook;
     }
     return new Error("Book is already added!");
+  }
+
+  static async updateBook(
+    updateBookId: string,
+    newBookData: Book
+  ): Promise<Book | Error> {
+    const books = await this.readAllBooks();
+    const bookFound = books.find((book) => book.id === updateBookId);
+    if (bookFound === undefined) {
+      return new Error("Book that you want to update does not exist!");
+    } else {
+      const updatedBooks = books.map((book) =>
+        book.id === updateBookId ? { ...book, ...newBookData } : book
+      );
+      await this.writeBooks(updatedBooks);
+      return bookFound;
+    }
   }
 
   static async getRecommendations(genre: string): Promise<Book[]> {

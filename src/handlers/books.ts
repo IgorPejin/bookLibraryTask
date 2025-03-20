@@ -32,8 +32,19 @@ export function importBooks(request: Request, response: Response) {
   response.send({});
 }
 
-export function updateBookById(request: Request, response: Response) {
-  response.send({});
+export async function updateBookById(request: Request, response: Response) {
+  const updateBookId = request.params.id;
+  const newBookData = request.body;
+  const updatedBook = await LibraryService.updateBook(
+    updateBookId,
+    newBookData
+  );
+  if (updatedBook instanceof Error) {
+    response.send({ error: "Book that you wanted to update does not exist" });
+  } else {
+    console.log("Sucesfully updated book !");
+    response.send(updatedBook);
+  }
 }
 
 export function deleteBookById(request: Request, response: Response) {
