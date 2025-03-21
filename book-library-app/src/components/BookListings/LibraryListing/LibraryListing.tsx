@@ -88,6 +88,9 @@ const LibraryListing = (props: Props) => {
     clearFields();
     setIsAdding(false);
     setIsEditing(false);
+    if (selectedBook) {
+      selectedBook.isSelected = false;
+    }
   };
 
   const handlePageChange = (
@@ -134,6 +137,11 @@ const LibraryListing = (props: Props) => {
       setAuthor(book.author);
       setYear(String(book.year));
       setGenre(book.genre);
+    }
+
+    book.isSelected = true;
+    if (selectedBook) {
+      selectedBook.isSelected = false;
     }
   };
   const findRatingForBook = (bookId: string): number => {
@@ -382,6 +390,11 @@ const LibraryListing = (props: Props) => {
 
               <Tooltip title="Delete book">
                 <IconButton
+                  style={
+                    book.isSelected
+                      ? { visibility: "visible" }
+                      : { visibility: "hidden" }
+                  }
                   disabled={book.isSoftDeleted ? true : false}
                   onClick={() => handleDeleteButton(book)}
                   color="error"

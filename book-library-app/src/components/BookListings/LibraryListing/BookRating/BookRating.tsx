@@ -25,7 +25,10 @@ function BookRating(props: Props) {
   ) => {
     event.preventDefault();
     setIsRatingEnabled(true);
+
     if (newRating !== null) props.handleRatingChange(book.id, newRating);
+
+    book.isSelected = true;
 
     const toRecommend = newRating && newRating > 5 ? true : false;
 

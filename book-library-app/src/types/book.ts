@@ -7,4 +7,5 @@ export default interface Book {
   recommendations?: number;
   nonrecommendations?: number;
   isSoftDeleted?: boolean;
+  isSelected?: boolean;
 }
