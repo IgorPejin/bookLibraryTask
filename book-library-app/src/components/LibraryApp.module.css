@@ -1,9 +1,10 @@
 .libraryAppWrapper {
-  padding: 3rem 10rem;
+  padding: 2rem 3rem;
   display: flex;
   gap: 2.5rem;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
 }
 .libraryAppHeading {
   align-self: flex-start;

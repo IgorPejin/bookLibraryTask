@@ -6,4 +6,5 @@ export default interface Book {
   genre: string;
   recommendations?: number;
   nonrecommendations?: number;
+  isSoftDeleted?: boolean;
 }

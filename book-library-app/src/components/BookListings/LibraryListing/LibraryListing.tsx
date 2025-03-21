@@ -12,14 +12,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendAndArchiveIcon from "@mui/icons-material/SendAndArchive";
-import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
-import Rating from "@mui/material/Rating";
-import Box from "@mui/material/Box";
-import ReplayIcon from "@mui/icons-material/Replay";
 import { useState } from "react";
 import axios from "axios";
+import BookRating from "./BookRating/BookRating";
 
 interface Props {
   books: Book[];
@@ -27,6 +24,9 @@ interface Props {
   updateBooks: (newBookData: Book) => void;
   updateBooksBatched: (newBooks: Book[]) => void;
   deleteBook: (book: Book) => void;
+  totalPages: number;
+  currentPage: number;
+  setPage: (page: number) => void;
 }
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -43,8 +43,27 @@ const VisuallyHiddenInput = styled("input")({
 const LibraryListing = (props: Props) => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isBookDeleted, setIsBookDeleted] = useState<boolean>(false);
+
   const [selectedBook, setSelectedBook] = useState<Book>();
-  const [rating, setRating] = useState<number | null>(0);
+
+  const [ratings, setRatings] = useState<{ [key: string]: number }[]>([]);
+  const handleRatingChange = (bookId: string, newValue: number) => {
+    setRatings((prevRatings) => {
+      const existingRatingIndex = prevRatings.findIndex(
+        (rating) => Object.keys(rating)[0] === bookId
+      );
+
+      if (existingRatingIndex !== -1) {
+        const updatedRatings = [...prevRatings];
+        updatedRatings[existingRatingIndex] = { [bookId]: newValue };
+        return updatedRatings;
+      } else {
+        return [...prevRatings, { [bookId]: newValue }];
+      }
+    });
+  };
+
   const [isbn, setIsbn] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
@@ -71,9 +90,17 @@ const LibraryListing = (props: Props) => {
     setIsEditing(false);
   };
 
-  function handleChangeIsbn(e: React.ChangeEvent<HTMLInputElement>) {
+  const handlePageChange = (
+    e: React.ChangeEvent<unknown>,
+    newPageNumber: number
+  ) => {
+    e.preventDefault();
+    props.setPage(newPageNumber);
+  };
+
+  const handleChangeIsbn = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsbn(e.target.value);
-  }
+  };
 
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -99,11 +126,21 @@ const LibraryListing = (props: Props) => {
     setSelectedBook(book);
     setIsAdding(false);
     setIsEditing(true);
-    setIsbn(book.id);
-    setTitle(book.title);
-    setAuthor(book.author);
-    setYear(String(book.year));
-    setGenre(book.genre);
+    setIsBookDeleted(true);
+    if (!book.isSoftDeleted) {
+      setIsBookDeleted(false);
+      setIsbn(book.id);
+      setTitle(book.title);
+      setAuthor(book.author);
+      setYear(String(book.year));
+      setGenre(book.genre);
+    }
+  };
+  const findRatingForBook = (bookId: string): number => {
+    const ratingObject = ratings.find(
+      (rating) => Object.keys(rating)[0] === bookId
+    );
+    return ratingObject ? ratingObject[bookId] : 0;
   };
 
   const handleBookEdit = async (selectedBook: Book | undefined) => {
@@ -120,7 +157,6 @@ const LibraryListing = (props: Props) => {
       `http://localhost:3000/books/${selectedBook?.id}`,
       editedBook
     );
-    console.log(updateBookResponse);
     if (updateBookResponse.data.error) {
       alert(updateBookResponse.data.error);
     } else {
@@ -164,7 +200,10 @@ const LibraryListing = (props: Props) => {
         alert(addBookResponse.data.error);
       } else {
         clearFields();
-        props.deleteBook(book);
+        //this would couse pagination issues but will re-render state and remove book right away
+        // props.deleteBook(book);
+        book.isSoftDeleted = true;
+        setIsBookDeleted(true);
       }
     }
   };
@@ -190,49 +229,6 @@ const LibraryListing = (props: Props) => {
     }
   }
 
-  const handleUndoRating = () => {
-    setRating(0);
-  };
-
-  const handleUpdateRating = async (
-    event: React.SyntheticEvent,
-    newRating: number | null,
-    book: Book
-  ) => {
-    event.preventDefault();
-    setRating(newRating);
-
-    const toRecommend = newRating && newRating > 5 ? true : false;
-
-    const newBookRecommendations =
-      book.recommendations && toRecommend
-        ? book.recommendations++
-        : book.recommendations;
-
-    const newBookNonRecommendations =
-      book.nonrecommendations && !toRecommend
-        ? book.nonrecommendations++
-        : book.nonrecommendations;
-
-    const updatedBook: Book = {
-      id: isbn,
-      title: title,
-      author: author,
-      year: Number(year),
-      genre: genre,
-      recommendations: newBookRecommendations,
-      nonrecommendations: newBookNonRecommendations,
-    };
-
-    const recommendationsResponse = await axios.put(
-      `http://localhost:3000/books/recommendations/${toRecommend}}`,
-      updatedBook
-    );
-    if (recommendationsResponse.data.error) {
-      alert(recommendationsResponse.data.error);
-    }
-  };
-
   return (
     <div className={styles.libraryListingWrapper}>
       <div
@@ -244,48 +240,53 @@ const LibraryListing = (props: Props) => {
         <IconButton onClick={handleBackButton} color="primary">
           <ArrowBackIcon />
         </IconButton>
-        <TextField
-          id="standard-basic"
-          value={isbn}
-          onChange={handleChangeIsbn}
-          label="isbn"
-          variant="standard"
-        />
-        <TextField
-          id="standard-basic"
-          value={title}
-          onChange={handleChangeTitle}
-          label="title"
-          variant="standard"
-        />
-        <TextField
-          id="standard-basic"
-          value={author}
-          onChange={handleChangeAuthor}
-          label="author"
-          variant="standard"
-        />
-        <TextField
-          id="standard-basic"
-          type="text"
-          slotProps={{
-            htmlInput: {
-              inputMode: "numeric",
-              pattern: "[0-9]*",
-            },
-          }}
-          value={year}
-          onChange={handleChangeYear}
-          label="year"
-          variant="standard"
-        />
-        <TextField
-          id="standard-basic"
-          value={genre}
-          onChange={handleChangeGenre}
-          label="genre"
-          variant="standard"
-        />
+        <div
+          style={isBookDeleted ? { display: "none" } : {}}
+          className={styles.libraryListingTextFields}
+        >
+          <TextField
+            id="standard-basic"
+            value={isbn}
+            onChange={handleChangeIsbn}
+            label="isbn"
+            variant="standard"
+          />
+          <TextField
+            id="standard-basic"
+            value={title}
+            onChange={handleChangeTitle}
+            label="title"
+            variant="standard"
+          />
+          <TextField
+            id="standard-basic"
+            value={author}
+            onChange={handleChangeAuthor}
+            label="author"
+            variant="standard"
+          />
+          <TextField
+            id="standard-basic"
+            type="text"
+            slotProps={{
+              htmlInput: {
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+              },
+            }}
+            value={year}
+            onChange={handleChangeYear}
+            label="year"
+            variant="standard"
+          />
+          <TextField
+            id="standard-basic"
+            value={genre}
+            onChange={handleChangeGenre}
+            label="genre"
+            variant="standard"
+          />
+        </div>
 
         {isAdding && (
           <IconButton onClick={handleBookAdd} color="primary">
@@ -308,7 +309,13 @@ const LibraryListing = (props: Props) => {
         }
         className={styles.libraryListingHeader}
       >
-        <h2>Browse the library: </h2>
+        <Pagination
+          count={props.totalPages}
+          page={props.currentPage}
+          onChange={handlePageChange}
+          size="medium"
+          color="primary"
+        />
         <div className={styles.libraryListingOptions}>
           <Button
             sx={{ margin: "1rem", fontSize: "1.2rem", textAlign: "center" }}
@@ -340,8 +347,8 @@ const LibraryListing = (props: Props) => {
             key={book.id + book.author}
             sx={
               isEditing && selectedBook?.id === book.id
-                ? { backgroundColor: "#D4F1F4" }
-                : {}
+                ? { backgroundColor: "#D4F1F4", height: "80px" }
+                : { height: "80px" }
             }
             onClick={() => handleIsEditing(book)}
             disablePadding
@@ -356,44 +363,26 @@ const LibraryListing = (props: Props) => {
                 <>
                   <ListItemText
                     inset
-                    primary={`✅ This book is available!`}
-                    secondary={`ISBN: ${book.id}`}
+                    primary={
+                      book.isSoftDeleted
+                        ? `❌ This book is not available!`
+                        : `✅ This book is available!`
+                    }
+                    secondary={!book.isSoftDeleted && `ISBN: ${book.id}`}
                   />
-                  <ListItemText>
-                    <Box>
-                      <Typography component="legend">
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          {rating !== 0 && (
-                            <>
-                              <IconButton
-                                size="small"
-                                sx={{ marginRight: "2rem", padding: "0" }}
-                                onClick={() => handleUndoRating()}
-                                color="primary"
-                              >
-                                <ReplayIcon />
-                              </IconButton>
-                            </>
-                          )}
-                          {rating !== 0 ? "✍️ Rated!" : "🤔 Rate this book ?"}
-                        </div>
-                      </Typography>
-                      <Rating
-                        disabled={rating !== 0}
-                        name="simple-controlled"
-                        value={rating}
-                        max={10}
-                        onChange={(event, newValue) =>
-                          handleUpdateRating(event, newValue, book)
-                        }
-                      />
-                    </Box>
-                  </ListItemText>
+                  {!book.isSoftDeleted && (
+                    <BookRating
+                      book={book}
+                      rating={findRatingForBook(book.id)}
+                      handleRatingChange={handleRatingChange}
+                    ></BookRating>
+                  )}
                 </>
               )}
 
               <Tooltip title="Delete book">
                 <IconButton
+                  disabled={book.isSoftDeleted ? true : false}
                   onClick={() => handleDeleteButton(book)}
                   color="error"
                 >
@@ -404,7 +393,6 @@ const LibraryListing = (props: Props) => {
           </ListItem>
         ))}
       </List>
-      <Pagination count={10} size="small" />
     </div>
   );
 };
