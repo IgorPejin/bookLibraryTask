@@ -1,0 +1,16 @@
+.bookRating {
+  display: flex;
+}
+
+.bookRatingMobile {
+  display: none;
+}
+
+@media screen and (max-width: 750px) {
+  .bookRating {
+    display: none;
+  }
+  .bookRatingMobile {
+    display: block;
+  }
+}

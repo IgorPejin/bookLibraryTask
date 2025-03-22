@@ -2,13 +2,16 @@ import {
   Box,
   IconButton,
   ListItemText,
+  MenuItem,
   Rating,
+  Select,
   Typography,
 } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 import Book from "../../../../types/book";
 import { useState } from "react";
 import axios from "axios";
+import styles from "./BookRating.module.css";
 
 interface Props {
   book: Book;
@@ -19,18 +22,23 @@ interface Props {
 function BookRating(props: Props) {
   const [isRatingEnabled, setIsRatingEnabled] = useState<boolean>(false);
   const handleUpdateRating = async (
-    event: React.SyntheticEvent,
+    event: React.SyntheticEvent | undefined,
     newRating: number | null,
     book: Book
   ) => {
-    event.preventDefault();
+    event?.preventDefault();
     setIsRatingEnabled(true);
 
     if (newRating !== null) props.handleRatingChange(book.id, newRating);
 
     book.isSelected = true;
 
-    const toRecommend = newRating && newRating > 5 ? true : false;
+    let toRecommend = newRating && newRating > 5 ? true : false;
+
+    //edge case when user clicks same rating
+    if (newRating === null) {
+      toRecommend = props.rating > 5 ? true : false;
+    }
 
     let newBookRecommendations = 0;
     let newBookNonRecommendations = 0;
@@ -77,7 +85,7 @@ function BookRating(props: Props) {
               <>
                 <IconButton
                   size="small"
-                  sx={{ marginRight: "2rem", padding: "0" }}
+                  sx={{ marginRight: "0.2rem", padding: "0" }}
                   onClick={() => handleUndoRating()}
                   color="primary"
                 >
@@ -88,15 +96,33 @@ function BookRating(props: Props) {
             {isRatingEnabled ? "✍️ Rated!" : "🤔 Rate this book ?"}
           </div>
         </Typography>
-        <Rating
-          disabled={isRatingEnabled}
-          name="simple-controlled"
-          value={props.rating}
-          max={10}
-          onChange={(event, newValue) =>
-            handleUpdateRating(event, newValue, props.book)
-          }
-        />
+        <div className={styles.bookRating}>
+          <Rating
+            size="small"
+            disabled={isRatingEnabled}
+            name="simple-controlled"
+            value={props.rating}
+            max={10}
+            onChange={(event, newValue) =>
+              handleUpdateRating(event, newValue, props.book)
+            }
+          />
+        </div>
+
+        <div className={styles.bookRatingMobile}>
+          <Select
+            onChange={(e) =>
+              handleUpdateRating(undefined, Number(e.target.value), props.book)
+            }
+            defaultValue={1}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+              <MenuItem key={num} value={num}>
+                {num}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
       </Box>
     </ListItemText>
   );

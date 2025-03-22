@@ -35,13 +35,16 @@ const Recommendations = () => {
   return (
     <div className={styles.recommendationsWrapper}>
       <div className={styles.recommendationsOptions}>
-        <h2>Books recommended by genre </h2>
+        <h2 className={styles.recommendationsHeader}>
+          Books recommended by genre
+        </h2>
         <Autocomplete
           options={genres}
+          size="small"
           onChange={handleChange}
           onInputChange={handleClear}
           value={selectedGenre}
-          sx={{ width: 300 }}
+          sx={{ width: 200 }}
           renderInput={(params) => <TextField {...params} label="Genre" />}
         />
       </div>

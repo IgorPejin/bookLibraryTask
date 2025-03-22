@@ -318,10 +318,11 @@ const LibraryListing = (props: Props) => {
         className={styles.libraryListingHeader}
       >
         <Pagination
+          sx={{ margin: "1rem" }}
           count={props.totalPages}
           page={props.currentPage}
           onChange={handlePageChange}
-          size="medium"
+          size="small"
           color="primary"
         />
         <div className={styles.libraryListingOptions}>
@@ -349,20 +350,28 @@ const LibraryListing = (props: Props) => {
           </Button>
         </div>
       </div>
-      <List sx={{ width: "100%", bgcolor: "azure", marginBottom: "1rem" }}>
+      <List
+        sx={{
+          width: "100%",
+          bgcolor: "azure",
+          marginBottom: "1rem",
+          justifyContent: "center",
+        }}
+      >
         {props.books.map((book) => (
           <ListItem
             key={book.id + book.author}
             sx={
               isEditing && selectedBook?.id === book.id
-                ? { backgroundColor: "#D4F1F4", height: "80px" }
-                : { height: "80px" }
+                ? { backgroundColor: "#D4F1F4", height: "120px" }
+                : { height: "120px" }
             }
             onClick={() => handleIsEditing(book)}
             disablePadding
           >
-            <ListItemButton>
+            <ListItemButton sx={{ padding: "0", height: "120px" }}>
               <ListItemText
+                sx={{ paddingLeft: "0.4rem" }}
                 inset
                 primary={`${book.title} (${book.year}) by ${book.author}`}
                 secondary={`Genre: ${book.genre}`}
@@ -370,6 +379,7 @@ const LibraryListing = (props: Props) => {
               {isEditing && selectedBook?.id === book.id && (
                 <>
                   <ListItemText
+                    sx={{ padding: "0 0.5rem" }}
                     inset
                     primary={
                       book.isSoftDeleted

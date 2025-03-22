@@ -8,6 +8,7 @@
 .recommendationsHeader {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 1rem;
 }
 .recommendationsOptions {
   display: flex;
@@ -19,4 +20,14 @@
   gap: 4rem;
   justify-content: center;
   list-style-type: none;
+  padding: 0;
+}
+
+@media screen and (max-width: 680px) {
+  .recommendationsOptions {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
 }

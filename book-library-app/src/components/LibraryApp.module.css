@@ -10,3 +10,21 @@
   align-self: flex-start;
   margin: 0;
 }
+
+@media screen and (max-width: 980px) {
+  .libraryAppWrapper {
+    padding: 2rem 1rem;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  .libraryAppHeading {
+    align-self: center;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .libraryAppWrapper {
+    padding: 1rem 0;
+  }
+}
